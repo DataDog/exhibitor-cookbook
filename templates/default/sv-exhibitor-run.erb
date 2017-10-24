@@ -1,5 +1,9 @@
 #!/bin/sh
 exec 2>&1
+<% limits = node['exhibitor']['ulimits'] %>
+<% if limits && !limits.empty? %>
+ulimit <% limits.each { |option, value| %>-<%= option %> <%= value %> <% } %>
+<% end %>
 exec chpst -u <%= @options[:user] %> \
   java -Dlog4j.configuration=file://<%= @options[:log4j] %> \
   -jar <%= @options[:jar] %> <%= @options[:cli] %>
