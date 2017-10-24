@@ -18,7 +18,7 @@ default[:exhibitor][:log_to_syslog]   = '1'
 
 # The limits for the Java processes running exhibitor.
 default[:exhibitor]['ulimits'] = {
-  'n' => 30000, # override the default of 4096
+  'n' => 30000, # override the default of 4096 (-n == nofile)
 }
 
 # Command line arguments
