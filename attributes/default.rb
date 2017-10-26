@@ -16,6 +16,8 @@ default[:exhibitor][:transaction_dir] = '/tmp/zookeeper'
 default[:exhibitor][:log_index_dir]   = '/tmp/zookeeper_log_indexes'
 default[:exhibitor][:log_to_syslog]   = '1'
 
+default[:exhibitor][:ulimits]   = nil
+
 # Command line arguments
 default[:exhibitor][:cli] = {
   port: '8080',
