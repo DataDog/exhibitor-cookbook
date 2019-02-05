@@ -1,0 +1,42 @@
+dist: trusty
+sudo: true
+language: ruby
+cache:
+  directories:
+  - "$HOME/.berkshelf"
+addons:
+  apt:
+    sources:
+    - chef-stable-trusty
+    packages:
+    - chefdk
+services: docker
+if: "(type = pull_request) OR (tag IS present) OR (branch = master)"
+before_install:
+- chef --version
+- eval "$(chef shell-init bash)"
+install:
+# needed to properly test w/ magic’s properties_config()
+- chef gem install java-properties
+# This fixes https://github.com/rubygems/rubygems/issues/2213
+- sudo chef exec gem update --system 2.7.5
+before_script:
+- sudo iptables -L DOCKER || ( echo "DOCKER iptables chain missing" ; sudo iptables -N DOCKER )
+script: $TEST
+env:
+  matrix:
+  - TEST="chef exec delivery local verify"
+  - TEST="$KITCHEN_CMD default-ubuntu-1404"
+  - TEST="$KITCHEN_CMD default-ubuntu-1604"
+  - TEST="$KITCHEN_CMD default-centos-6"
+  - TEST="$KITCHEN_CMD default-centos-7"
+  - TEST="$KITCHEN_CMD upstart-ubuntu-1404"
+  - TEST="$KITCHEN_CMD maven-ubuntu-1604"
+  - TEST="$KITCHEN_CMD maven-centos-6"
+  - TEST="$KITCHEN_CMD systemd-centos-7"
+  - TEST="$KITCHEN_CMD systemd-ubuntu-1604"
+  global:
+  - KITCHEN_CMD="kitchen test -d always"
+notifications:
+  slack:
+    secure: NtbgXZwevcpjug1vXn8TdM+un69ZALwIrTJ8lr5BMX7+n/4zH5qQjvX81ziq+s1Ipsnz3a/bE6ARaeZn6TtZJWU5hyG7lFSYhN9TeQddudqXphw8CBJ45VUdBPmbT9eWzWM36Hx4sB5Fb6y54TTqEL4hBODFRKueRQDFmPSwSqA=

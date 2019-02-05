@@ -1,21 +1,80 @@
 ---
 driver:
-  name: vagrant
+  name: dokken
+  privileged: true  # because Docker and SystemD/Upstart
+  chef_version: <%= ENV['CHEF_VERSION'] || 'current' %>
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
 
 platforms:
-<% %w(11.8.2).each do |chef_version| %>
-  - name: ubuntu-12.04
-    driver_config:
-      box: opscode_ubuntu-12.04
-      require_chef_omnibus: <%= chef_version %>
+  - name: ubuntu-14.04
+    driver:
+      image: dokken/ubuntu-14.04
+      pid_one_command: /sbin/init
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install sudo -y
 
-  - name: centos-6.4
-  - name: centos-6.5
-<% end %>
+  - name: ubuntu-16.04
+    driver:
+      image: dokken/ubuntu-16.04
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install sudo -y
+
+  - name: centos-6
+    driver:
+      image: dokken/centos-6
+      pid_one_command: /sbin/init
+      intermediate_instructions:
+        - RUN /usr/bin/yum install sudo -y
+
+  - name: centos-7
+    driver:
+      image: dokken/centos-7
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/yum install sudo -y
+
 
 suites:
   - name: default
     run_list:
-      - recipe[apt::default]
       - recipe[exhibitor::default]
+      - recipe[exhibitor::service]
+
+  - name: upstart
+    run_list:
+      - recipe[exhibitor::default]
+      - recipe[exhibitor::service]
     attributes:
+      exhibitor:
+        service_style: upstart
+    includes:
+      - ubuntu-14.04
+
+  - name: maven
+    run_list:
+      - recipe[exhibitor::default]
+      - recipe[exhibitor::service]
+    attributes:
+      exhibitor:
+        install_method: maven
+    excludes:
+      - ubuntu-14.04
+
+  - name: systemd
+    run_list:
+      - recipe[exhibitor::default]
+      - recipe[exhibitor::service]
+    attributes:
+      exhibitor:
+        service_style: systemd
+    includes:
+      - ubuntu-16.04
+      - centos-7
