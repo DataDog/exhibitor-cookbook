@@ -23,7 +23,7 @@ if should_install_gradle?
     action :install
   end
 
-  node.default[:gradle][:mirror] = "http://services.gradle.org/distributions/gradle-#{node[:gradle][:version]}-bin.zip"
+  node.default[:gradle][:mirror] = "https://services.gradle.org/distributions/gradle-#{node[:gradle][:version]}-bin.zip"
   remote_file ::File.join(Chef::Config[:file_cache_path], 'gradle.zip') do
     owner 'root'
     mode 00644
