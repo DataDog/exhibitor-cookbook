@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # recipes/gradle.rb
 #
 # Copyright 2014, Simple Finance Technology Corp.
@@ -23,10 +25,10 @@ if should_install_gradle?
     action :install
   end
 
-  node.default[:gradle][:mirror] = "http://services.gradle.org/distributions/gradle-#{node[:gradle][:version]}-bin.zip"
+  node.default[:gradle][:mirror] = "https://services.gradle.org/distributions/gradle-#{node[:gradle][:version]}-bin.zip"
   remote_file ::File.join(Chef::Config[:file_cache_path], 'gradle.zip') do
     owner 'root'
-    mode 00644
+    mode 0o0644
     source node[:gradle][:mirror]
     checksum node[:gradle][:checksum]
     action :create
@@ -35,7 +37,7 @@ if should_install_gradle?
   execute 'unzip gradle' do
     user 'root'
     cwd Chef::Config[:file_cache_path]
-    command "unzip ./gradle.zip"
+    command 'unzip ./gradle.zip'
     action :run
   end
 
