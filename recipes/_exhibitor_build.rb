@@ -20,6 +20,15 @@ end
 
 if should_install_exhibitor?(node[:exhibitor][:jar_dest])
   # We need Gradle to build the artifact.
+
+  wanted_version = Gem::Version.new(node[:exhibitor][:version])
+  cutoff_version = Gem::Version.new('1.6.0')
+  if wanted_version >= cutoff_version
+    package = 'io.soabase'
+  else
+    package = 'com.netflix'
+  end
+
   include_recipe 'exhibitor::gradle'
 
   build_path = ::File.join(Chef::Config[:file_cache_path], 'exhibitor')
@@ -32,7 +41,7 @@ if should_install_exhibitor?(node[:exhibitor][:jar_dest])
 
   template ::File.join(build_path, 'build.gradle') do
     owner 'root'
-    variables(version: node[:exhibitor][:version])
+    variables(version: node[:exhibitor][:version], package: package)
     action :create
   end
 

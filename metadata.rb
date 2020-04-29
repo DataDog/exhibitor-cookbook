@@ -4,7 +4,7 @@ maintainer_email 'ops@simple.com'
 license 'Apache v2.0'
 description 'Installs Netflix Exhibitor'
 long_description 'Exhibitor'
-version '0.4.0'
+version '0.4.2'
 
 depends 'build-essential'
 depends 'java'
